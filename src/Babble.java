@@ -10,20 +10,13 @@ public class Babble {
     private BabbleInputListener inputListener;
     private boolean running;
     private Display gui;
+    private Game gameState = new Game();
     public Babble(){
         listener = new BabbleListener();
         inputListener = new BabbleInputListener();
         gui = new Display(listener, inputListener);
         running = true;
-        mainLoop();
-    }
-
-    public void mainLoop(){
-
-    }
-
-    public void processInput(String input){
-
+        gui.logConsole(gameState.getPlot());
     }
 
     /**
@@ -56,8 +49,8 @@ public class Babble {
         public void actionPerformed(ActionEvent e) {
             System.out.println(e.getActionCommand());
             if(e.getActionCommand().length() < 48) {
-                processInput(e.getActionCommand());
                 gui.logInput(e.getActionCommand());
+                gui.logConsole(gameState.processInput(e.getActionCommand()));
             }else{
                 gui.logInput("tried to say much too much");
             }

@@ -176,8 +176,12 @@ public class Display {
         input.setText("");
     }
 
+    public void logConsole(String input){
+        log.setText(log.getText() + "console: " + input + "\n");
+    }
+
     public void logInput(String input){
-        log.setText(log.getText() + "\nuser: " + input);
+        log.setText(log.getText() + "user: " + input + "\n");
     }
 
     public void focus(){
