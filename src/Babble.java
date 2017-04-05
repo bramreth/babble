@@ -1,4 +1,3 @@
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -37,8 +36,31 @@ public class Babble {
                 case "quit":
                     System.exit(0);
                     break;
-                case "back":
+                case "save":
+                    gui.updateSaves(Game.getSlots());
+                    gui.changeCard(Display.State.SAVE);
+                    break;
+                case "load":
+                    gui.updateSaves(Game.getSlots());
+                    gui.changeCard(Display.State.LOAD);
+                    break;
+                case "menu":
                     gui.changeCard(Display.State.MENU);
+                    break;
+                case "load slot":
+                    if(gameState.loadGameDataFromFile(gui.getLoadSlot())){
+                        gui.update(gameState.getPlot());
+                        gui.changeCard(Display.State.ADVENTURE);
+                    }
+                    break;
+                case "save to slot":
+                    gameState.saveGameDataToFile(gui.getSlot());
+                    gui.updateSaves(Game.getSlots());
+                    gui.changeCard(Display.State.ADVENTURE);
+                    break;
+                case "delete":
+                    gameState.deleteSave(gui.getSlot());
+                    gui.updateSaves(Game.getSlots());
                     break;
             }
         }
@@ -51,6 +73,7 @@ public class Babble {
             if(e.getActionCommand().length() < 48) {
                 gui.logInput(e.getActionCommand());
                 gui.logConsole(gameState.processInput(e.getActionCommand()));
+                gameState.process(e.getActionCommand());
             }else{
                 gui.logInput("tried to say much too much");
             }

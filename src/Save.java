@@ -1,4 +1,7 @@
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -6,15 +9,18 @@ import java.util.ArrayList;
  * from a permanent file
  * Created by bramreth on 4/5/17.
  */
-public class Save {
+public class Save implements Serializable {
     private int plotInfo;
-    private ArrayList<String> saveInfo;
+    private String saveInfo;
     private String name;
     public Save(){
         plotInfo = 0;
-        saveInfo = new ArrayList<>();
+        saveInfo = "temp";
     }
 
+    public String getName(){
+        return name;
+    }
     public int getPlotInfo(){
         return plotInfo;
     }

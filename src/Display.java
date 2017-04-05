@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.ArrayList;
 
 /**
  * Created by bramreth on 4/4/17.
@@ -16,6 +18,8 @@ public class Display {
     private JButton adventureButton;
     private JButton optionsButton;
     private JButton quitButton;
+    private JComboBox saveSlots;
+    private JComboBox loadSlots;
     private JFrame frame;
     private JPanel cards;
     public ActionListener listener;
@@ -62,11 +66,15 @@ public class Display {
         JPanel adventureCard = createAdventureCard();
         JPanel menuCard = createMenuCard();
         JPanel optionsCard = createOptionsCard();
+        JPanel saveCard = createSaveCard();
+        JPanel loadCard = createLoadCard();
         //Create the panel that contains the "cards".
         cards = new JPanel(new CardLayout());
         cards.add(menuCard, "Menu");
         cards.add(adventureCard, "Adventure");
         cards.add(optionsCard, "Options");
+        cards.add(saveCard, "Save");
+        cards.add(loadCard, "Load");
 
         contentPane.add(headerPane, BorderLayout.PAGE_START);
         contentPane.add(cards, BorderLayout.CENTER);
@@ -75,6 +83,7 @@ public class Display {
     public JPanel createAdventureCard(){
         JPanel adventurePanel = new JPanel(new GridLayout(2,1));
         JPanel bottomPanel = new JPanel(new GridLayout(2,1));
+        JPanel buttonPanel = new JPanel(new GridLayout(1,3));
         adventurePanel.setBackground(bgColour);
         log = new JTextArea();
         log.setBackground(bgColour);
@@ -85,15 +94,30 @@ public class Display {
         input.setBackground(buttonColour);
         input.setForeground(textColour);
         input.addActionListener(inputListener);
-        JButton backButton = new JButton("Back");
+        JButton saveButton = new JButton("Save");
+        saveButton.setBackground(buttonColour);
+        saveButton.setForeground(textColour);
+        saveButton.setFont(normalFont);
+        saveButton.setActionCommand("save");
+        saveButton.addActionListener(listener);
+        JButton loadButton = new JButton("Load");
+        loadButton.setBackground(buttonColour);
+        loadButton.setForeground(textColour);
+        loadButton.setFont(normalFont);
+        loadButton.setActionCommand("load");
+        loadButton.addActionListener(listener);
+        JButton backButton = new JButton("Menu");
         backButton.setBackground(buttonColour);
         backButton.setForeground(textColour);
         backButton.setFont(normalFont);
-        backButton.setActionCommand("back");
+        backButton.setActionCommand("menu");
         backButton.addActionListener(listener);
         adventurePanel.add(sp);
         bottomPanel.add(input);
-        bottomPanel.add(backButton);
+        buttonPanel.add(backButton);
+        buttonPanel.add(saveButton);
+        buttonPanel.add(loadButton);
+        bottomPanel.add(buttonPanel);
         adventurePanel.add(bottomPanel);
         return adventurePanel;
     }
@@ -142,11 +166,11 @@ public class Display {
         JLabel temp5 = new JLabel("placeholder");
         temp5.setFont(normalFont);
         temp5.setForeground(textColour);
-        JButton backButton = new JButton("Back");
+        JButton backButton = new JButton("Menu");
         backButton.setBackground(buttonColour);
         backButton.setForeground(textColour);
         backButton.setFont(normalFont);
-        backButton.setActionCommand("back");
+        backButton.setActionCommand("menu");
         backButton.addActionListener(listener);
         optionsPanel.add(temp1);
         optionsPanel.add(temp2);
@@ -155,6 +179,71 @@ public class Display {
         optionsPanel.add(temp5);
         optionsPanel.add(backButton);
         return optionsPanel;
+    }
+
+    public JPanel createSaveCard(){
+        JPanel savePanel = new JPanel(new GridLayout(2,1));
+        JPanel buttonPanel = new JPanel(new GridLayout(1,3));
+        savePanel.setBackground(bgColour);
+        saveSlots = new JComboBox();
+        saveSlots.addItem("save slot 1");
+        saveSlots.addItem("save slot 2");
+        saveSlots.addItem("save slot 3");
+        saveSlots.setBackground(bgColour);
+        saveSlots.setForeground(textColour);
+        JButton saveButton = new JButton("Save");
+        saveButton.setBackground(buttonColour);
+        saveButton.setForeground(textColour);
+        saveButton.setFont(normalFont);
+        saveButton.setActionCommand("save to slot");
+        saveButton.addActionListener(listener);
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.setBackground(buttonColour);
+        deleteButton.setForeground(textColour);
+        deleteButton.setFont(normalFont);
+        deleteButton.setActionCommand("delete");
+        deleteButton.addActionListener(listener);
+        JButton backButton = new JButton("Back");
+        backButton.setBackground(buttonColour);
+        backButton.setForeground(textColour);
+        backButton.setFont(normalFont);
+        backButton.setActionCommand("adventure");
+        backButton.addActionListener(listener);
+        savePanel.add(saveSlots);
+        buttonPanel.add(saveButton);
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(backButton);
+        savePanel.add(buttonPanel);
+        return savePanel;
+    }
+
+    public JPanel createLoadCard(){
+        JPanel loadPanel = new JPanel(new GridLayout(2,1));
+        JPanel buttonPanel = new JPanel(new GridLayout(1,2));
+        loadPanel.setBackground(bgColour);
+        loadSlots = new JComboBox();
+        loadSlots.addItem("save slot 1");
+        loadSlots.addItem("save slot 2");
+        loadSlots.addItem("save slot 3");
+        loadSlots.setBackground(bgColour);
+        loadSlots.setForeground(textColour);
+        JButton loadButton = new JButton("Load");
+        loadButton.setBackground(buttonColour);
+        loadButton.setForeground(textColour);
+        loadButton.setFont(normalFont);
+        loadButton.setActionCommand("load slot");
+        loadButton.addActionListener(listener);
+        JButton backButton = new JButton("Back");
+        backButton.setBackground(buttonColour);
+        backButton.setForeground(textColour);
+        backButton.setFont(normalFont);
+        backButton.setActionCommand("adventure");
+        backButton.addActionListener(listener);
+        loadPanel.add(loadSlots);
+        buttonPanel.add(loadButton);
+        buttonPanel.add(backButton);
+        loadPanel.add(buttonPanel);
+        return loadPanel;
     }
 
     public void changeCard(State stateIn){
@@ -169,7 +258,35 @@ public class Display {
             case OPTIONS:
                 cl.show(cards, "Options");
                 break;
+            case SAVE:
+                cl.show(cards, "Save");
+                break;
+            case LOAD:
+                cl.show(cards, "Load");
+                break;
         }
+    }
+    public void updateSaves(ArrayList<String> fileNames){
+        saveSlots.removeAllItems();
+        saveSlots.addItem("save slot 1: "+fileNames.get(0));
+        saveSlots.addItem("save slot 2: "+fileNames.get(1));
+        saveSlots.addItem("save slot 3: "+fileNames.get(2));
+        loadSlots.removeAllItems();
+        loadSlots.addItem("save slot 1: "+fileNames.get(0));
+        loadSlots.addItem("save slot 2: "+fileNames.get(1));
+        loadSlots.addItem("save slot 3: "+fileNames.get(2));
+    }
+    public void update(String splashInfo){
+        log.setText("console: " + splashInfo + "\n");
+    }
+
+    public int getLoadSlot(){
+        System.out.println(loadSlots.getSelectedItem());
+        return loadSlots.getSelectedIndex()+1;
+    }
+    public int getSlot(){
+        System.out.println(saveSlots.getSelectedItem());
+        return saveSlots.getSelectedIndex()+1;
     }
 
     public void clearInput(){
@@ -189,6 +306,6 @@ public class Display {
     }
 
     public enum State{
-        MENU, ADVENTURE, OPTIONS
+        MENU, ADVENTURE, OPTIONS, SAVE, LOAD
     }
 }
