@@ -7,11 +7,13 @@ import java.util.ArrayList;
 public class Game {
     private Save saveSlot;
     private String buffer;
+    private ArrayList<Location> localeList;
     /**
      * new game constructor
      */
     public Game(){
         saveSlot = new Save();
+        initLocales();
     }
 
     /**
@@ -20,14 +22,30 @@ public class Game {
      */
     public Game(Save saveIn){
         saveSlot = saveIn;
+        initLocales();
+    }
+
+    public void initLocales(){
+        localeList = new ArrayList<>();
+        localeList.add(new Location("your cell", "A sickly green interstellar detention cell"));
     }
 
     public String getPlot(){
         switch(saveSlot.getPlotInfo()){
             case 0:
-                return "What is your name then?";
+                return "|narrator| What is your name then?";
             case 2:
-                return "here's the world then you crazy wanker";
+                return "|narrator| Okay " + saveSlot.getName() + ", simple rules."
+                +"\nconsole: |narrator| If you want to do something, tell me what you want to do"
+                    +"\nconsole: |narrator| and what you want to do it to."
+                        +"\nconsole: |narrator| Try it, open your eyes.";
+            case 3:
+                saveSlot.setCurrentLocation(localeList.get(0));
+                return "Artificial light floods your eyes. An all to familiar room is before you,"
+                        +"\nconsole: the sickly pale green tone of a human interstellar detention cell."
+                        +"\nconsole: You are lying down on a flimsy plastic bed."
+                        +"\nconsole: |intercom| Inmate " + saveSlot.getName().substring(0,1)
+                        + "221, please stand up for inspection.";
         }
         return "";
     }
@@ -35,16 +53,16 @@ public class Game {
     public String processInput(String input){
         SimpleInstruction ins = process(input);
         if(!ins.isValid()){
-            return "I don't understand what you mean";
+            return "|narrator| I don't understand what you mean";
         }
         switch(saveSlot.getPlotInfo()){
             case 0:
                 if(ins.result != null){
                     saveSlot.movePlot(1);
                     buffer = input;
-                    return "So its " + input + " then?";
+                    return "|narrator| So its " + input + " then?";
                 }
-                return "Oi give me just one name, I don't care for more";
+                return "|narrator| Oi give me just one name, I don't care for more";
             case 1:
                 if(processYes(input)){
                     saveSlot.addName(buffer);
@@ -53,6 +71,15 @@ public class Game {
                 }else {
                     saveSlot.movePlot(0);
                     return getPlot();
+                }
+            case 2:
+                SimpleInstruction temp = process(input);
+                if(temp.getVerb().equals("open") ){
+                    saveSlot.addName(buffer);
+                    saveSlot.movePlot(3);
+                    return getPlot();
+                }else {
+                    return "|narrator| That's hard with your eyes shut~";
                 }
 
         }
@@ -98,6 +125,14 @@ public class Game {
             }
         }
         return list;
+    }
+
+    public Save getSaveSlot() {
+        return saveSlot;
+    }
+
+    public void setSaveSlot(Save saveSlot) {
+        this.saveSlot = saveSlot;
     }
 
     public class SimpleInstruction {

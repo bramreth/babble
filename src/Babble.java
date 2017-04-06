@@ -14,6 +14,7 @@ public class Babble {
         listener = new BabbleListener();
         inputListener = new BabbleInputListener();
         gui = new Display(listener, inputListener);
+        gui.updateLabels(gameState);
         running = true;
         gui.logConsole(gameState.getPlot());
     }
@@ -49,7 +50,8 @@ public class Babble {
                     break;
                 case "load slot":
                     if(gameState.loadGameDataFromFile(gui.getLoadSlot())){
-                        gui.update(gameState.getPlot());
+                        gameState = new Game(gameState.getSaveSlot());
+                        gui.update(gameState);
                         gui.changeCard(Display.State.ADVENTURE);
                     }
                     break;
@@ -74,6 +76,7 @@ public class Babble {
                 gui.logInput(e.getActionCommand());
                 gui.logConsole(gameState.processInput(e.getActionCommand()));
                 gameState.process(e.getActionCommand());
+                gui.updateLabels(gameState);
             }else{
                 gui.logInput("tried to say much too much");
             }

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class Display {
     private final Color bgColour = new Color(40, 50, 56);
     private final Color buttonColour = new Color(56, 67, 76);
-    private final Color textColour = new Color(0, 204, 0);
+    private Color textColour = new Color(0, 204, 0);
     private Font normalFont = new Font("sans-serif", Font.PLAIN, 12);
     private Font titleFont = new Font("sans-serif", Font.BOLD, 13);
     private JTextArea log;
@@ -18,6 +18,8 @@ public class Display {
     private JButton adventureButton;
     private JButton optionsButton;
     private JButton quitButton;
+    private JLabel locLabel;
+    private JLabel itemLabel;
     private JComboBox saveSlots;
     private JComboBox loadSlots;
     private JFrame frame;
@@ -82,8 +84,9 @@ public class Display {
 
     public JPanel createAdventureCard(){
         JPanel adventurePanel = new JPanel(new GridLayout(2,1));
-        JPanel bottomPanel = new JPanel(new GridLayout(2,1));
+        JPanel bottomPanel = new JPanel(new GridLayout(3,1));
         JPanel buttonPanel = new JPanel(new GridLayout(1,3));
+        JPanel infoPanel = new JPanel(new GridLayout(2,2));
         adventurePanel.setBackground(bgColour);
         log = new JTextArea();
         log.setBackground(bgColour);
@@ -94,6 +97,22 @@ public class Display {
         input.setBackground(buttonColour);
         input.setForeground(textColour);
         input.addActionListener(inputListener);
+        JLabel locHeadLabel = new JLabel("Location:", SwingConstants.CENTER);
+        locHeadLabel.setBackground(bgColour);
+        locHeadLabel.setForeground(textColour);
+        locHeadLabel.setFont(titleFont);
+        locLabel = new JLabel("-");
+        locLabel.setBackground(bgColour);
+        locLabel.setForeground(textColour);
+        locLabel.setFont(normalFont);
+        JLabel itemHeadLabel = new JLabel("Your items:", SwingConstants.CENTER);
+        itemHeadLabel.setBackground(bgColour);
+        itemHeadLabel.setForeground(textColour);
+        itemHeadLabel.setFont(titleFont);
+        itemLabel = new JLabel("-");
+        itemLabel.setBackground(bgColour);
+        itemLabel.setForeground(textColour);
+        itemLabel.setFont(normalFont);
         JButton saveButton = new JButton("Save");
         saveButton.setBackground(buttonColour);
         saveButton.setForeground(textColour);
@@ -113,6 +132,12 @@ public class Display {
         backButton.setActionCommand("menu");
         backButton.addActionListener(listener);
         adventurePanel.add(sp);
+        infoPanel.add(locHeadLabel);
+        infoPanel.add(itemHeadLabel);
+        infoPanel.add(locLabel);
+        infoPanel.add(itemLabel);
+        infoPanel.setBackground(bgColour);
+        bottomPanel.add(infoPanel);
         bottomPanel.add(input);
         buttonPanel.add(backButton);
         buttonPanel.add(saveButton);
@@ -276,8 +301,37 @@ public class Display {
         loadSlots.addItem("save slot 2: "+fileNames.get(1));
         loadSlots.addItem("save slot 3: "+fileNames.get(2));
     }
-    public void update(String splashInfo){
-        log.setText("console: " + splashInfo + "\n");
+    public void update(Game gameInfo){
+        log.setText("console: " + gameInfo.getPlot() + "\n");
+    }
+    public void updateLabels(Game gameInfo){
+        try {
+            locLabel.setText(gameInfo.getSaveSlot().getCurrentLocation().getName());
+            String iList = "";
+            for (Item temp : gameInfo.getSaveSlot().getHeldItems()) {
+                if (gameInfo.getSaveSlot().getHeldItems().get(gameInfo.getSaveSlot().getHeldItems().size() - 1) == temp) {
+                    iList += temp.getName();
+                } else {
+                    iList += temp.getName() + ", ";
+                }
+            }
+            itemLabel.setText(iList);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void updateLists(Location locIn, ArrayList<Item> itemsIn){
+        locLabel.setText(locIn.getName());
+        String iList = "";
+        for(Item temp: itemsIn){
+            if(itemsIn.get(itemsIn.size()-1) == temp){
+                iList += temp.getName();
+            }else {
+                iList += temp.getName() + ", ";
+            }
+        }
+        itemLabel.setText(iList);
     }
 
     public int getLoadSlot(){
