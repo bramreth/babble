@@ -46,6 +46,8 @@ public class Game {
                         +"\nconsole: You are lying down on a flimsy plastic bed."
                         +"\nconsole: |intercom| Inmate " + saveSlot.getName().substring(0,1)
                         + "221, please stand up for inspection.";
+            case 4:
+                return "That's all folks!";
         }
         return "";
     }
@@ -53,7 +55,7 @@ public class Game {
     public String processInput(String input){
         SimpleInstruction ins = process(input);
         if(!ins.isValid()){
-            return "|narrator| I don't understand what you mean";
+            return "|narrator| " + ins.error;
         }
         switch(saveSlot.getPlotInfo()){
             case 0:
@@ -74,13 +76,17 @@ public class Game {
                 }
             case 2:
                 SimpleInstruction temp = process(input);
-                if(temp.getVerb().equals("open") ){
-                    saveSlot.addName(buffer);
+                if(temp.getVerb() == Verb.OPEN && temp.isValid()){
                     saveSlot.movePlot(3);
                     return getPlot();
                 }else {
                     return "|narrator| That's hard with your eyes shut~";
                 }
+            case 3:
+                String actionResult = makeAction(ins);
+                System.out.println(makeAction(ins));
+                return actionResult;
+
 
         }
         return "";
@@ -103,6 +109,18 @@ public class Game {
         return new SimpleInstruction();
     }
 
+    public String makeAction(SimpleInstruction in){
+        switch (in.getVerb()){
+            case GO:
+                saveSlot.setCurrentLocation((Location)in.getNoun());
+                return "You go to the " + in.getNoun().getName();
+            case LOOK:
+                System.out.println(in.getNoun().getName());
+                System.out.println(in.getNoun().getDescription());
+                return in.getNoun().getDescription();
+        }
+        return in.getResult();
+    }
     public boolean processYes(String input){
         if(input.contains("yes")||input.contains("certainly")||input.contains("affirmative")) {
             return true;
@@ -137,9 +155,10 @@ public class Game {
 
     public class SimpleInstruction {
         private boolean valid;
-        private String verb;
-        private String noun;
+        private Verb verb;
+        private Noun noun;
         private String result;
+        private String error;
         private boolean interjection;
 
         public SimpleInstruction() {
@@ -147,9 +166,60 @@ public class Game {
         }
 
         public SimpleInstruction(String verbIn, String nounIn) {
-            verb = verbIn;
-            noun = nounIn;
-            valid = true;
+            valid = false;
+            verb = Verb.INVALID;
+            switch (verbIn){
+                case "walk":
+                case "go":
+                case "move":
+                case "proceed":
+                case "run":
+                    verb = verb.GO;
+                    error = nounIn + "is not a valid place to go to";
+                    if(saveSlot.getCurrentLocation().getExits().size() == 1){
+                        if(nounIn.equals("door") || nounIn.equals("exit")){
+                            noun = saveSlot.getCurrentLocation().getExits().get(0);
+                            valid = true;
+                        }
+                    }
+                    for(Location temp: saveSlot.getCurrentLocation().getExits()) {
+                        if (nounIn.equals(temp.getName())) {
+                            noun = temp;
+                            valid = true;
+                        }
+                    }
+                    break;
+                case "open":
+                    verb = Verb.OPEN;
+                    if(nounIn.equals("eyes")){
+                        valid = true;
+                        error = "your eyes are open though?";
+                    }
+                    break;
+                    //finish implementing
+                case "look":
+                case "search":
+                case "examine":
+                    verb = Verb.LOOK;
+                    for(Item item :saveSlot.getCurrentLocation().getItems()){
+                        if(nounIn.equals(item.getName())){
+                            noun = item;
+                            valid = true;
+                        }
+                    }
+                    if(nounIn.equals("room") || nounIn.equals("around") || nounIn.equals(saveSlot.getCurrentLocation().getName())){
+                        noun = saveSlot.getCurrentLocation();
+                        valid = true;
+                    }
+                    System.out.println(saveSlot.getCurrentLocation().getName());
+                    if(!valid){
+                        error = " you can't really look at '"+nounIn+"'";
+                    }
+                    break;
+                default:
+                    valid = false;
+                    error = "that's not a verb I understand";
+            }
         }
 
         public SimpleInstruction(String interjectionIn) {
@@ -157,16 +227,17 @@ public class Game {
                 interjection = true;
             } else if (interjectionIn.contains("no") || interjectionIn.contains("negative")) {
                 interjection = false;
+                error = "Why would you say that?";
             }
             result = interjectionIn;
             valid = true;
         }
 
-        public String getNoun() {
+        public Noun getNoun() {
             return noun;
         }
 
-        public String getVerb() {
+        public Verb getVerb() {
             return verb;
         }
 
@@ -181,8 +252,16 @@ public class Game {
         public boolean isValid() {
             return valid;
         }
+
+
     }
 
+    /**
+     * the enumerated list of valid verbs, to be updated
+     */
+    public enum Verb{
+        INVALID, GO, OPEN, LOOK, TAKE, DROP, USE
+    }
         public boolean loadGameDataFromFile(int slotNo){
             File load;
             boolean init = false;

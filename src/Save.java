@@ -14,6 +14,7 @@ public class Save implements Serializable {
     private int carryWeight;
     private Location currentLocation;
     private ArrayList<Item> heldItems;
+    private boolean eyesOpen;
     private Color colour;
     public Save(){
         plotInfo = 0;

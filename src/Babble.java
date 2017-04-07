@@ -72,10 +72,10 @@ public class Babble {
         @Override
         public void actionPerformed(ActionEvent e) {
             System.out.println(e.getActionCommand());
-            if(e.getActionCommand().length() < 48) {
+            if(e.getActionCommand().length() < 24) {
                 gui.logInput(e.getActionCommand());
                 gui.logConsole(gameState.processInput(e.getActionCommand()));
-                gameState.process(e.getActionCommand());
+                //gameState.process(e.getActionCommand());
                 gui.updateLabels(gameState);
             }else{
                 gui.logInput("tried to say much too much");

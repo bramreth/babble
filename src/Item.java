@@ -3,12 +3,11 @@ import java.io.Serializable;
 /**
  * Created by bramreth on 4/6/17.
  */
-public class Item implements Serializable {
-    private String name, description;
+public class Item extends Noun implements Serializable {
     private int weight;
     public Item(String nameIn, String descriptionIn, int weightIn){
-        name = nameIn;
-        description = descriptionIn;
+        super.name = nameIn;
+        super.description = descriptionIn;
         weight = weightIn;
     }
 
@@ -16,11 +15,5 @@ public class Item implements Serializable {
         return weight;
     }
 
-    public String getDescription() {
-        return description;
-    }
 
-    public String getName() {
-        return name;
-    }
 }

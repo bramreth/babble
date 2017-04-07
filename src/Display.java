@@ -13,6 +13,7 @@ public class Display {
     private Color textColour = new Color(0, 204, 0);
     private Font normalFont = new Font("sans-serif", Font.PLAIN, 12);
     private Font titleFont = new Font("sans-serif", Font.BOLD, 13);
+    private String username;
     private JTextArea log;
     private JTextField input;
     private JButton adventureButton;
@@ -27,6 +28,7 @@ public class Display {
     public ActionListener listener;
     public ActionListener inputListener;
     public Display(ActionListener listenerIn, ActionListener inputListenerIn){
+        username = "user";
         listener = listenerIn;
         inputListener = inputListenerIn;
         frame = new JFrame("Yuconz File App");
@@ -307,6 +309,8 @@ public class Display {
     public void updateLabels(Game gameInfo){
         try {
             locLabel.setText(gameInfo.getSaveSlot().getCurrentLocation().getName());
+            if(gameInfo.getSaveSlot().getName() != null)
+                username = gameInfo.getSaveSlot().getName();
             String iList = "";
             for (Item temp : gameInfo.getSaveSlot().getHeldItems()) {
                 if (gameInfo.getSaveSlot().getHeldItems().get(gameInfo.getSaveSlot().getHeldItems().size() - 1) == temp) {
@@ -352,7 +356,7 @@ public class Display {
     }
 
     public void logInput(String input){
-        log.setText(log.getText() + "user: " + input + "\n");
+        log.setText(log.getText() + username + ": " + input + "\n");
     }
 
     public void focus(){
